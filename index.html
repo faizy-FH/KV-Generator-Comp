@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KV Generator · FIT HUB</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e18; --bg2:#0f1626; --panel:#121b2e; --border:#223150;
+  --text:#EAF0FA; --muted:#6b84ad; --fade:#47597d;
+  --yellow:#FFC800; --accent:#2E6BFF;
+}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:
+  radial-gradient(1200px 600px at 80% -10%,rgba(46,107,255,.10),transparent 60%),
+  radial-gradient(900px 500px at -10% 110%,rgba(255,200,0,.07),transparent 55%),
+  var(--bg);
+  color:var(--text);min-height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 20px;overflow-x:hidden}
+
+/* ---- gate ---- */
+#gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);padding:24px}
+#gate.hidden{display:none}
+.gate-card{width:100%;max-width:340px;background:var(--panel);border:1px solid var(--border);
+  border-radius:18px;padding:34px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.gate-mark{font-weight:900;letter-spacing:.14em;font-size:13px;color:var(--yellow)}
+.gate-title{font-size:20px;font-weight:800;margin-top:12px}
+.gate-sub{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.04em}
+#gatePass{width:100%;margin-top:22px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:13px 14px;color:var(--text);font-size:14px;letter-spacing:.22em;
+  text-align:center;outline:none}
+#gatePass:focus{border-color:var(--accent)}
+.gate-btn{width:100%;margin-top:12px;background:var(--yellow);color:#1a1200;border:0;
+  border-radius:10px;padding:13px;font-size:13px;font-weight:800;letter-spacing:.06em;cursor:pointer}
+.gate-btn:active{transform:translateY(1px)}
+.gate-err{font-size:10px;color:#ff6b6b;margin-top:11px;min-height:13px;letter-spacing:.04em}
+.gate-note{font-size:9px;color:var(--fade);margin-top:16px;line-height:1.6}
+@keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}50%{transform:translateX(-4px)}}
+.shake{animation:shake .4s}
+
+/* ---- menu ---- */
+.wrap{width:100%;max-width:720px;opacity:0;transition:opacity .25s ease}
+.wrap.show{opacity:1}
+.head{text-align:center;margin-bottom:30px}
+.eyebrow{font-weight:900;letter-spacing:.16em;font-size:12px;color:var(--yellow)}
+.h1{font-size:26px;font-weight:800;margin-top:8px}
+.lead{font-size:13px;color:var(--muted);margin-top:8px;letter-spacing:.02em}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
+  background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px 20px;
+  overflow:hidden;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease}
+.card:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--c)}
+.card .ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;background:color-mix(in srgb,var(--c) 18%,transparent);
+  border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}
+.card .tag{font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--c);margin-top:16px}
+.card .nm{font-size:16px;font-weight:800;margin-top:3px}
+.card .ds{font-size:11.5px;color:var(--muted);margin-top:7px;line-height:1.55}
+.card .go{margin-top:16px;font-size:11px;font-weight:700;color:var(--fade);letter-spacing:.04em}
+.card:hover .go{color:var(--c)}
+.foot{text-align:center;margin-top:28px;font-size:10px;color:var(--fade);line-height:1.7}
+.foot b{color:var(--muted);font-weight:700}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card" id="gateCard">
+    <div class="gate-mark">FIT HUB</div>
+    <div class="gate-title">KV Generator</div>
+    <div class="gate-sub">Internal Tool · Compilation</div>
+    <input type="password" id="gatePass" placeholder="PASSCODE" autocomplete="off" spellcheck="false">
+    <button class="gate-btn" onclick="tryGate()">Unlock</button>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-note">Client-side gate. Bukan security beneran &mdash; cuma nyegah orang iseng nemu link-nya.</div>
+  </div>
+</div>
+
+<div class="wrap" id="wrap">
+  <div class="head">
+    <div class="eyebrow">FIT HUB · MARKETING</div>
+    <div class="h1">Mau bikin KV apa?</div>
+    <div class="lead">Pilih generator di bawah. Tiap tool buka di halamannya sendiri.</div>
+  </div>
+
+  <div class="grid">
+    <a class="card" href="bau.html" style="--c:#FFC800">
+      <div class="ic">📈</div>
+      <div class="tag">PROMO BAU · FHR</div>
+      <div class="nm">Promo BAU</div>
+      <div class="ds">Promo bulanan reguler. 5 format, config promo + S&amp;K.</div>
+      <div class="go">Buka →</div>
+    </a>
+
+    <a class="card" href="flashsale.html" style="--c:#2E6BFF">
+      <div class="ic">⚡</div>
+      <div class="tag">FLASH SALE · FHG</div>
+      <div class="nm">Flash Sale FHG</div>
+      <div class="ds">Flash Sale FIT HUB GO. In-App, IGS, Landing + 11 scene.</div>
+      <div class="go">Buka →</div>
+    </a>
+
+    <a class="card" href="rtc.html" style="--c:#22C3DE">
+      <div class="ic">🔄</div>
+      <div class="tag">RENEWAL · RTC</div>
+      <div class="nm">Renewal RTC</div>
+      <div class="ds">KV renewal per-club pas launch RTC. Pilih 3 USP.</div>
+      <div class="go">Buka →</div>
+    </a>
+  </div>
+
+  <div class="foot">
+    <b>KV-Generator-Comp</b> · akses sekali di depan, kebawa ke semua generator selama tab kebuka.
+  </div>
+</div>
+
+<script>
+// ===== ACCESS GATE (shared hash + sessionStorage key with the generators) =====
+const GATE_HASH = '94249adb302033bfb3114d64f42e0ed9e77cd252daf0ed47e207f53cb11f223a';
+
+function jsSha256(ascii) {
+  function rr(v,a){return (v>>>a)|(v<<(32-a));}
+  var mp=Math.pow, maxWord=mp(2,32), i,j,result='',words=[],
+      asciiBitLength=ascii.length*8,
+      hash=jsSha256.h=jsSha256.h||[], k=jsSha256.k=jsSha256.k||[],
+      primeCounter=k.length, isComposite={};
+  for (var candidate=2; primeCounter<64; candidate++) {
+    if (!isComposite[candidate]) {
+      for (i=0;i<313;i+=candidate) isComposite[i]=candidate;
+      hash[primeCounter]=(mp(candidate,.5)*maxWord)|0;
+      k[primeCounter++]=(mp(candidate,1/3)*maxWord)|0;
+    }
+  }
+  ascii+='\x80';
+  while (ascii.length%64-56) ascii+='\x00';
+  for (i=0;i<ascii.length;i++){ j=ascii.charCodeAt(i); if(j>>8) return; words[i>>2]|=j<<((3-i)%4)*8; }
+  words[words.length]=((asciiBitLength/maxWord)|0);
+  words[words.length]=(asciiBitLength);
+  for (j=0;j<words.length;){
+    var w=words.slice(j,j+=16), oldHash=hash;
+    hash=hash.slice(0,8);
+    for (i=0;i<64;i++){
+      var w15=w[i-15], w2=w[i-2], a=hash[0], e=hash[4],
+        t1=hash[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]
+           +(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]
+           +(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0),
+        t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+      hash=[(t1+t2)|0].concat(hash);
+      hash[4]=(hash[4]+t1)|0;
+    }
+    for (i=0;i<8;i++) hash[i]=(hash[i]+oldHash[i])|0;
+  }
+  for (i=0;i<8;i++) for (j=3;j+1;j--){ var b=(hash[i]>>(j*8))&255; result+=((b<16)?0:'')+b.toString(16); }
+  return result;
+}
+
+async function sha256hex(str) {
+  if (window.crypto && crypto.subtle) {
+    try {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    } catch(e) { /* fall through */ }
+  }
+  return jsSha256(str);
+}
+
+
+function showMenu(){
+  document.getElementById('gate').classList.add('hidden');
+  document.getElementById('wrap').classList.add('show');
+}
+async function tryGate(){
+  const inp=document.getElementById('gatePass');
+  const err=document.getElementById('gateErr');
+  const h=await sha256hex(inp.value);
+  if(h===GATE_HASH){ sessionStorage.setItem('kvgen_ok','1'); showMenu(); }
+  else{
+    err.textContent='Passcode salah';
+    inp.value='';
+    const c=document.getElementById('gateCard');
+    c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+  }
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('gatePass')
+    .addEventListener('keydown',e=>{ if(e.key==='Enter') tryGate(); });
+  if(sessionStorage.getItem('kvgen_ok')==='1') showMenu();
+  else document.getElementById('gatePass').focus();
+});
+</script>
+</body></html>
