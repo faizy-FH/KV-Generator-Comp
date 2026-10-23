@@ -1040,7 +1040,7 @@ function promoBlock(isDisc, imgUrl, badgeWpx, sc, L, isDouble) {
 // PNG is lossless, so resolution is the only lever on file size. We render ONCE at the
 // max scale, then step down the ladder, measuring the REAL blob each time, until it fits.
 // No estimation — the number in the toast is the actual file the user gets.
-const EXPORT_BUDGET_MB = { inapp:4, igs:10, desktop:10, mobile:10, landing:10 };
+const EXPORT_BUDGET_MB = { inapp:4, igs:4, desktop:4, mobile:4, landing:4 };
 // Safety caps against browser canvas-area / memory limits, not against the budget.
 // Landing @4x = 7680×4320 (~33MP). Raise if your machines can take it.
 const EXPORT_MAX_SCALE = { inapp:3, igs:3, desktop:3, mobile:6, landing:4 };
@@ -1100,6 +1100,7 @@ async function renderBudgeted(tp, onProgress) {
   }
 }
 
+function ddmmyy(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return p(d.getDate())+p(d.getMonth()+1)+String(d.getFullYear()).slice(-2); }
 function saveBlob(blob, name) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1124,7 +1125,7 @@ async function dlKV() {
   try {
     const p = await renderBudgeted(tp, toast);
     if (!p) throw new Error('toBlob returned null at every scale');
-    saveBlob(p.blob, `FitHub_KV_${tp}_${p.sc}x_${Date.now()}.png`);
+    saveBlob(p.blob, `${tp.toUpperCase()}_${ddmmyy()}_BAUFHR.png`);
     const mb = (p.blob.size/1048576).toFixed(1);
     toast(p.over
       ? `⚠ ${p.w}×${p.h} · ${mb}MB — over ${p.budgetMB}MB even @1x`
@@ -1183,7 +1184,7 @@ async function dlAll() {
     try {
       const p = await renderBudgeted(tp, m => toast(`[${i+1}/${keys.length}] ${m}`));
       if (!p) { results.push({ format: tp, status: 'FAILED' }); continue; }
-      saveBlob(p.blob, `FitHub_KV_${tp}_${p.sc}x_${stamp}.png`);
+      saveBlob(p.blob, `${tp.toUpperCase()}_${ddmmyy()}_BAUFHR.png`);
       results.push({
         format: tp, scale: p.sc+'x', px: `${p.w}×${p.h}`,
         MB: (p.blob.size/1048576).toFixed(2),

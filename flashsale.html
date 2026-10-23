@@ -159,11 +159,22 @@ async function snap(tpl){const prev=S.tpl;S.tpl=tpl;const t=TPL[tpl],cv=document
   cv.style.width=t.W+'px';cv.style.height=t.H+'px';cv.classList.toggle('tp',!!t.tp);cv.innerHTML=buildHTML(t);cv.style.transform='none';
   await document.fonts.ready;const canvas=await html2canvas(cv,{width:t.W,height:t.H,scale:1,backgroundColor:null,useCORS:true,logging:false});
   S.tpl=prev;render();return canvas;}
+const MAX_PNG=4*1024*1024; // 4 MB hard cap per exported PNG
+async function pngUnder(srcCanvas,maxBytes){ // downscale until the PNG blob fits the cap
+  const W=srcCanvas.width,H=srcCanvas.height; let scale=1,canvas=srcCanvas;
+  for(let i=0;i<10;i++){ const blob=await new Promise(r=>canvas.toBlob(r,'image/png')); if(!blob)return null;
+    if(blob.size<=maxBytes)return blob;
+    scale*=Math.sqrt(maxBytes/blob.size)*0.94;
+    const w=Math.max(1,Math.round(W*scale)),h=Math.max(1,Math.round(H*scale));
+    canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(srcCanvas,0,0,w,h);}
+  return await new Promise(r=>canvas.toBlob(r,'image/png'));}
+function fhgName(file){ return file.toUpperCase()+'_FlashSale_BAUFHG.png'; }
 async function dlOne(){const b=dlBtn;b.disabled=true;b.textContent='\u2026';try{const t=TPL[S.tpl],c=await snap(S.tpl);
-  const a=document.createElement('a');a.download='FHG_'+t.file+'.png';a.href=c.toDataURL('image/png');a.click();toast('Download \u2713');}
+  const blob=await pngUnder(c,MAX_PNG);const a=document.createElement('a');a.download=fhgName(t.file);a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('Download \u2713');}
   catch(e){console.error(e);toast('Gagal')}b.disabled=false;b.innerHTML='&#8595; Download';}
 async function dlAll(){const b=dlAllBtn;b.disabled=true;b.textContent='Rendering\u2026';try{
-  for(const tpl of ['inapp','igs','landing']){const c=await snap(tpl);const a=document.createElement('a');a.download='FHG_'+TPL[tpl].file+'.png';a.href=c.toDataURL('image/png');a.click();await new Promise(r=>setTimeout(r,400));}
+  for(const tpl of ['inapp','igs','landing']){const c=await snap(tpl);const blob=await pngUnder(c,MAX_PNG);const a=document.createElement('a');a.download=fhgName(TPL[tpl].file);a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);await new Promise(r=>setTimeout(r,400));}
   toast('Semua format ke-download \u2713');}catch(e){console.error(e);toast('Gagal')}b.disabled=false;b.innerHTML='&#8595; Download All Format';}
 async function copyKV(){const b=copyBtn;b.disabled=true;b.textContent='\u2026';try{const c=await snap(S.tpl);
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);toast('Ke-copy \u2713 tinggal paste');}

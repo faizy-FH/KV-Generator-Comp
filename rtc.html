@@ -245,11 +245,21 @@ function renderAll(){
 
 /* ---------- export ---------- */
 function slug(s){ return s.replace(/[^a-z0-9]+/gi,"").replace(/^./,c=>c.toUpperCase()) || "Club"; }
+const MAX_PNG=4*1024*1024; // 4 MB hard cap per exported PNG
+async function pngUnder(srcCanvas,maxBytes){ // downscale until the PNG blob fits the cap
+  const W=srcCanvas.width,H=srcCanvas.height; let scale=1,canvas=srcCanvas;
+  for(let i=0;i<10;i++){ const blob=await new Promise(r=>canvas.toBlob(r,"image/png")); if(!blob)return null;
+    if(blob.size<=maxBytes)return blob;
+    scale*=Math.sqrt(maxBytes/blob.size)*0.94;
+    const w=Math.max(1,Math.round(W*scale)),h=Math.max(1,Math.round(H*scale));
+    canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext("2d");ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.drawImage(srcCanvas,0,0,w,h);}
+  return await new Promise(r=>canvas.toBlob(r,"image/png"));}
 function fullBlob(key){
   const c=document.createElement("canvas"); render(c,key,getData(),1);
-  return new Promise(res=>c.toBlob(res,"image/png"));
+  return pngUnder(c,MAX_PNG);
 }
-function fname(key){ const d=getData(); return `RTC_${slug(d.club.replace(/\s+(\w)/g,(m,a)=>a.toUpperCase()))}_${FORMATS[key].file}.png`; }
+function fname(key){ const d=getData(); return `${FORMATS[key].file.replace(/_/g,"")}_${slug(d.club.replace(/\s+(\w)/g,(m,a)=>a.toUpperCase()))}_RenewalRTC.png`; }
 function save(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
 async function downloadOne(key){ save(await fullBlob(key), fname(key)); }
 async function downloadAll(){
