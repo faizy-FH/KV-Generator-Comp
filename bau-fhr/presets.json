@@ -1,0 +1,13 @@
+{
+  "_comment": "Edit tiap bulan. Path relatif ke lokasi HTML generator di repo. Label = teks yang muncul di bawah thumbnail.",
+  "month": "2026-11",
+  "backgrounds": [
+    { "label": "Nov · Hero Pushup", "file": "assets/bg/2026-11-hero-pushup.jpg" },
+    { "label": "Nov · Hero Treadmill", "file": "assets/bg/2026-11-hero-treadmill.jpg" },
+    { "label": "Nov · Studio Gelap", "file": "assets/bg/2026-11-studio-gelap.jpg" }
+  ],
+  "lockups": [
+    { "label": "Nov · Ganti Bulan", "file": "assets/lu/2026-11-ganti-bulan.png" },
+    { "label": "Nov · Bentuk Badan", "file": "assets/lu/2026-11-bentuk-badan.png" }
+  ]
+}
